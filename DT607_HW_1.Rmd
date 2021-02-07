@@ -1,0 +1,206 @@
+---
+title: "Super Bowl Ads"
+author: "MGinorio"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+## Super Bowl Analysis 
+
+
+#### The American Super Bowl is a statement in the Advertisement industry due to the creative nature of their ads. Every year many brands showcase their best pieces of advertisement and see which team did it better
+
+#### This time we are asking the question - what is behind the creation of the ads? Was it funny? did it use sex to sell the product? did it feature a celebrity?
+
+## Problem Statement
+
+#### The aim of this analysis is to determine which category predominates in the super bowl add arena. Is it sex, comedy, animals or celebrities?
+
+## Implementation
+
+#### The data was scraped and manipulated accordingly for the analysis. The data was then reviewed graphically to determine what is the most used cateogry, how many times have been used over the years.
+
+## Results {.tabset .tabset-pills}
+
+### Overview
+
+![Super Bowl](https://raw.githubusercontent.com/mgino11/Super_Bowl_Ads_Analisys/main/doritossupebowl.0.jpg)
+
+```{r}
+url.show("https://projects.fivethirtyeight.com/super-bowl-ads/")
+```
+
+
+### Packages
+
+```{r}
+
+#Packages used
+
+library(tidytext)
+library(DT)
+library(tm)
+library(tidyverse)
+library(stringr)
+library(magrittr)
+library(leaflet)
+library(ggplot2)
+library(dplyr)
+library(plotly)
+library(forcats)
+
+```
+
+### 1.- Data Exploration 
+#### {.tabset}
+##### 1.1 Summary
+###### GITHUB - place the original .csv in a github Repository and have R read from the link.
+
+```{r}
+
+superbowl_ads <-read.csv("https://raw.githubusercontent.com/mgino11/Super_Bowl_Ads_Analisys/main/HW_1_superbowl-ads.csv")
+
+glimpse(superbowl_ads)
+
+
+```
+
+##### 1.2 Counting Qualitative Data
+#### Brands - Who has the most adds?
+
+##### From the information below we are able to determine that the brand with the greatest amount of ads is Budlight, followed by Budweiser and in third place we can Find Doritos.
+
+```{r}
+ superbowl_ads %>%
+  count(brand) %>%
+  arrange(desc(n))
+```
+#### Sex
+##### How many times a brand has used adds associated with sex?
+
+```{r}
+superbowl_ads %>%
+  count(use_sex) %>%
+  arrange(desc(n))
+```
+#### Animals
+##### How many times a brand has used adds associated with animals?
+```{r}
+superbowl_ads %>%
+  count(animals) %>%
+  arrange(desc(n))
+```
+#### Funny
+##### How many times a brand has used adds associated with comedy?
+```{r}
+superbowl_ads %>%
+  count(funny) %>%
+  arrange(desc(n))
+```
+#### {-}
+### 2.- Data Wrangling
+##### {.tabset}
+###### 2.1 Subsets
+####### Subset1 - Superbowl_ads_use
+####### We subset data in order to understand it better. Subset_1 allows us to see the a new data frame including variables like 
+* Year
+* Brand
+* Use_sex
+* Animals
+* Funny
+* Celebrity
+
+```{r}
+superbowl_ads %>% select(year, brand, funny, celebrity, animals, use_sex)
+head(superbowl_ads)
+
+
+```
+
+
+####### create data frame using Tibble
+```{r}
+superbowl_ads2 <- as_tibble(superbowl_ads)
+colnames(superbowl_ads2)
+
+```
+
+###### Factor $ Levels
+####### Subset_1 = superbowl_ads2
+####### In order to understand Categorical Data we need to use Levels and factors. The package used for this task is forcats
+```{r}
+glimpse(superbowl_ads2)
+
+superbowl_ads2 %>%
+  mutate(funny = fct_lump(funny, n = 50)) %>%
+  count(funny)
+
+```
+```{r}
+
+```
+
+####### Subset_2
+```{r}
+superbowl_ads2 %>%
+  count(use_sex, celebrity)
+  
+
+```
+
+
+### 3.- Graphs
+##### {.tabset}
+###### subset_1
+####### We want to interpret graphically the frequency of ads that use sex
+```{r}
+ggplot(superbowl_ads2, aes(x = use_sex)) + 
+  geom_bar() +
+  coord_flip()
+```
+
+####### We want to interpret graphically the frequency of funny ads
+
+```{r}
+ggplot(superbowl_ads2, aes(x = funny)) + 
+  geom_bar() +
+  coord_flip()
+```
+
+####### We want to compare the use of sex in ads vs. the use of comedy. We can clearly see that comedy has been used more than sex.
+
+
+```{r}
+ggplot(superbowl_ads2, aes(x = funny, fill = use_sex)) + 
+  geom_density(col = NA, alpha = 0.55)
+
+```
+
+##### {-}
+
+### 4.- Conclusion
+#### Super Bowl Ads
+#### SEX VS. COMEDY
+#### Thanks to the Data Wrangling and Graphs we can now understand that most of ads we see have more inclination for the use of sex than comedy. And since we determined earlier - Budlight + Budweiser + Doritos are the brands with the most amunt of ads over the years.
+
+```{r}
+ggplot(superbowl_ads2, aes(x = funny)) + 
+  geom_bar() +
+  coord_flip()
+ggplot(superbowl_ads2, aes(x = use_sex)) + 
+  geom_bar() +
+  coord_flip()
+```
+
+
+#### SEX vs. funny (different view)
+#### Brands seem to be more interested in pursuing the use of sex in ads instead of comedy.
+
+```{r}
+ggplot(superbowl_ads2, aes(x = funny, fill = use_sex)) + 
+  geom_density(col = NA, alpha = 0.55)
+```
+
+
+
